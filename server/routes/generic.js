@@ -1,25 +1,21 @@
 const jobRouter = require('express').Router();
-
-let allJobs = [
-  {id: "1", company: "starbucks", link: "www.starbucks.com", notes: "macchiato person", createTime: "1200"},
-  {id: "2", company: "bank of america", link: "www.bofa.com", notes: "rip you off", createTime: "1220"},
-  {id: "3", company: "district taco", link: "www.districttaco.com", notes: "queso con chile", createTime: "1245"}
-];
-
+const Job = require('../models/Job.model.js');
 /**
  * Returns thr id company, and link object keys by looping thrrough the data
  * @type {Array}
  */
 jobRouter.get('/', function showJobData(req, res, next) {
-  //add error handling
-    let output = [];
-  res.json(allJobs.map(function(job){
-        return{
-            id: job.id,
-            company: job.company,
-            link: job.link
-        };
-    }));
+    //add error handling
+
+    Job.find()
+        .then(function returnJob(allJobs) {
+            res.json(allJobs);
+        })
+        .catch(function handleError(err) {
+            let ourError = new Error('Unable to retrieve jobs');
+            ourError.status = 500;
+            next(ourError);
+        });
 });
 
 
@@ -30,27 +26,28 @@ jobRouter.get('/', function showJobData(req, res, next) {
  * @param {Function} next
  */
 function addAJob(req, res, next) {
-    let now = new Date();
-    console.log(now);
-    let newId = (allJobs.length + 1).toString();
-    let newJob = {
-        id: newId,
+    console.log('incoming data for POST', req.body);
+
+    let theJobCreated = new Job({
         company: req.body.company,
         link: req.body.link,
         notes: req.body.notes,
-        createTime: now
-    };
 
-    allJobs.push(newJob);
-    console.log(newJob);
-
-    res.json({
-        message: 'Job added',
-        newJob: req.body.newJob
     });
+    theJobCreated.save()
+        .then(function returnResponse(data) {
+            res.json(data);
+        })
+        .catch(function handleErrors(err) {
+            let ourError = new Error('Incorrect data'); //needs something else
+            err.status = 422;
+            next(err);
+        });
 
 }
 
 jobRouter.post('/', addAJob);
+
+
 
 module.exports = jobRouter;
