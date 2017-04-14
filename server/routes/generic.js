@@ -5,8 +5,6 @@ const Job = require('../models/Job.model.js');
  * @type {Array}
  */
 jobRouter.get('/', function showJobData(req, res, next) {
-    //add error handling
-
     Job.find()
         .then(function returnJob(allJobs) {
             res.json(allJobs);
@@ -27,13 +25,14 @@ jobRouter.get('/', function showJobData(req, res, next) {
  */
 function addAJob(req, res, next) {
     console.log('incoming data for POST', req.body);
-
+    let now = new Date();
     let theJobCreated = new Job({
         company: req.body.company,
         link: req.body.link,
         notes: req.body.notes,
-
+        createTime: now
     });
+    console.log(req.body.createTime);
     theJobCreated.save()
         .then(function returnResponse(data) {
             res.json(data);
@@ -46,8 +45,30 @@ function addAJob(req, res, next) {
 
 }
 
+
+
+
+jobRouter.delete("/:_id", function deleteAJob(req, res, next) {
+    console.log('Job to delete', req.ObjectId);
+    Job.deleteOne({
+            "/:_id": req.params.id
+        })
+        .then(function returnResponse(data) {
+            res.json(data);
+            return deleteAJob();
+        })
+        .catch(function handleErrors(err) {
+            let ourError = new Error('Data not found'); //needs something else
+            err.status = 404;
+            next(err);
+        });
+});
+
+
+
+
+
+
 jobRouter.post('/', addAJob);
-
-
 
 module.exports = jobRouter;

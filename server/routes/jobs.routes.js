@@ -1,5 +1,5 @@
 const jobRouter = require('express').Router();
-// const Job = require('../models/Job.model.js');
+const Job = require('../models/Job.model.js');
 
 jobRouter.get('/', function showAllJobs(req, res, next){
   Job.find()
@@ -68,4 +68,6 @@ function addAJob(req, res, next){
 }
 jobRouter.post('/', addAJob);
 
-module.exports = jobRouter
+
+
+module.exports = jobRouter;
