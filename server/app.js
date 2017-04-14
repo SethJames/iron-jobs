@@ -12,7 +12,7 @@ console.log('database location', process.env);
 
 app.use(express.static(__dirname + '/../client/public/'));
 
-app.use( '/api/jobs', require('./routes/generic.js'));
+app.use( '/api/jobs', require('./routes/jobs.routes.js'));
 
 // app.use(require('./middleware/page-not-found.middleware.js'));
 
